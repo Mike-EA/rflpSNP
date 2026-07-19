@@ -1,0 +1,67 @@
+#' Curated restriction enzyme catalog for PCR-RFLP / PIRA-PCR design
+#'
+#' An internal, curated catalog of Type II restriction enzymes used by
+#' \code{rflpSNP} to identify natural and primer-introduced (PIRA)
+#' restriction sites during PCR-RFLP experiment design. Derived from
+#' REBASE (emboss files, version 404, 2024) via Biopython's
+#' \code{Bio.Restriction} module, filtered to commercially available,
+#' single-cleavage-position enzymes with a recognition site of at least
+#' 4 bp. See \code{data-raw/PROVENANCE.md} in the package source for the
+#' full curation methodology, including a documented correction to the
+#' filtering criteria (do not filter on REBASE's \code{Defined}/
+#' \code{Ambiguous} tag; see notes below).
+#'
+#' @format A data frame with 610 rows and 13 variables:
+#' \describe{
+#'   \item{enzyme}{Character. Enzyme name, REBASE nomenclature (e.g. \code{"EcoRI"}).}
+#'   \item{recognition_site}{Character. Recognition sequence, 5' -> 3',
+#'     using IUPAC ambiguity codes where biologically applicable (e.g.
+#'     \code{"GANTC"} for HinfI, \code{"RAATTY"} for ApoI). Match against
+#'     genomic/amplicon sequences with
+#'     \code{Biostrings::matchPattern(..., fixed = FALSE)}.}
+#'   \item{site_length}{Integer. Length in bp of \code{recognition_site}.}
+#'   \item{fst5}{Integer. Cleavage position on the top strand, relative
+#'     to the start of \code{recognition_site} (REBASE/Biopython convention).}
+#'   \item{fst3}{Integer. Cleavage position on the bottom strand, relative
+#'     to the end of \code{recognition_site}.}
+#'   \item{ovhg}{Integer. Overhang length and sign: positive = 3'
+#'     overhang, negative = 5' overhang, zero = blunt. Validated against
+#'     textbook reference enzymes (EcoRI, PstI, SmaI, etc.); see
+#'     \code{data-raw/PROVENANCE.md}.}
+#'   \item{ovhg_seq}{Character. Overhang sequence, empty string for blunt cutters.}
+#'   \item{cut_type}{Character. One of \code{"blunt"}, \code{"5_overhang"},
+#'     \code{"3_overhang"}; derived from the sign of \code{ovhg}.}
+#'   \item{palindromic}{Logical. \code{FALSE} for Type IIS-like enzymes
+#'     with non-palindromic recognition sequences.}
+#'   \item{methylation_sensitive}{Logical. Enzyme activity is known to be
+#'     blocked or altered by genomic cytosine/adenine methylation at or
+#'     near the site. Provided as metadata only: PCR amplicons generated
+#'     with Taq polymerase are unmethylated, so this does not affect
+#'     standard PCR-RFLP / PIRA-PCR workflows in this package.}
+#'   \item{n_suppliers}{Integer. Number of commercial suppliers listed in REBASE.}
+#'   \item{suppliers}{Character. Semicolon-separated list of supplier names.}
+#'   \item{rebase_id}{Integer. REBASE database identifier, for cross-reference
+#'     at \url{https://rebase.neb.com}.}
+#' }
+#'
+#' @section Curation notes:
+#' Filtering relied on REBASE's \code{Commercially_available} and
+#' \code{OneCut} classification, plus a minimum recognition site length
+#' of 4 bp (excluding two methylation-mark-dependent entries whose
+#' REBASE "site" field is a non-informative 1-2 bp placeholder). Filtering
+#' on REBASE's \code{Defined}/\code{Ambiguous} tag was tested and
+#' rejected: it does not correspond to sequence-level IUPAC ambiguity or
+#' to cut-site certainty, and would have excluded well-characterized,
+#' routinely used enzymes such as HinfI and AhdI.
+#'
+#' @source Biopython \code{Bio.Restriction.Restriction_Dictionary}
+#'   (\url{https://github.com/biopython/biopython}), derived from REBASE
+#'   emboss files version 404 (2024). REBASE: Roberts RJ, Vincze T,
+#'   Posfai J, Macelis D. "REBASE-a database for DNA restriction and
+#'   modification: enzymes, genes and genomes." Nucleic Acids Research.
+#'
+#' @examples
+#' data(restriction_enzymes)
+#' head(restriction_enzymes)
+#' subset(restriction_enzymes, enzyme == "HinfI")
+"restriction_enzymes"
