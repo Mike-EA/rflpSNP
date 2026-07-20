@@ -38,7 +38,7 @@ OligoAnalyzer before ordering synthesis).
 
 - **R** >= 4.1, and preferably **RStudio** (makes everything below
   easier).
-- The packages `rflpSNP` depends on. Some come from **CRAN**
+- The packages `rflpSNP` depends on some other R packages that comes from **CRAN**
   (`TmCalculator`, `ggplot2`) and others from **Bioconductor**
   (`Biostrings`, `S4Vectors`) — Bioconductor is a repository separate from
   CRAN and needs its own installer.
