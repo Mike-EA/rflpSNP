@@ -34,3 +34,8 @@ utils::globalVariables(c(
   "Column", "Row", "Type", "Base", "Label", "GenPos",
   "Size", "Condition", "Y_pos", "Intensity", "Lane", "X"
 ))
+
+# Internal package utilities (not exported).
+
+#' @noRd
+`%||%` <- function(x, y) if (is.null(x)) y else x

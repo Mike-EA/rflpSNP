@@ -23,7 +23,9 @@ Imports:
     TmCalculator,
     ggplot2,
     stats,
-    utils
+    utils,
+    httr,
+    jsonlite
 Suggests:
     testthat (>= 3.0.0),
     knitr,
