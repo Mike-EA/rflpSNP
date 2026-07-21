@@ -25,7 +25,8 @@ Imports:
     stats,
     utils,
     httr,
-    jsonlite
+    jsonlite,
+    methods
 Suggests:
     testthat (>= 3.0.0),
     knitr,
