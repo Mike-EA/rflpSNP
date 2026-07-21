@@ -14,12 +14,23 @@
 #'   match where the SNP is located (default `1`, i.e. the base immediately
 #'   following the flank). Adjust only if the flanking-sequence convention
 #'   you are using differs from dbSNP's.
+#' @param rsid Character. Optional RefSNP identifier (e.g. `"rs1801133"`).
+#'   When provided, `locate_snp()` additionally calls
+#'   [resolve_pira_alleles()] to fetch and cross-check the alternate
+#'   allele(s) needed for PIRA-PCR primer design (requires internet access).
+#'   When `NULL` (the default), behavior is unchanged from previous versions
+#'   of this function.
+#' @param species Character. Passed to [resolve_pira_alleles()] when `rsid`
+#'   is provided. Default `"human"`.
 #'
 #' @return A list with the elements:
 #'   \item{snp_pos}{1-based coordinate of the SNP in `gene_seq`.}
 #'   \item{snp_base}{Nucleotide found at `snp_pos`.}
 #'   \item{strand}{`"forward"` or `"complementary"`, the strand on which the
 #'     flanking sequence match was found.}
+#'   \item{alleles}{Only present when `rsid` is supplied: the full result of
+#'     [resolve_pira_alleles()] (reference/alternate allele(s), strand
+#'     orientation, multiallelic flag, etc.).}
 #'
 #' @details
 #' This function assumes there is exactly one relevant match of the
@@ -28,8 +39,23 @@
 #' issued; in that case, using a longer and more specific flanking sequence
 #' is recommended.
 #'
+#' When `rsid` is supplied, allele resolution errors (e.g. no internet
+#' connection, invalid rsID) propagate as errors from `locate_snp()` itself
+#' — the SNP has already been located successfully by that point, so this
+#' distinguishes "the SNP location logic failed" from "the SNP was located,
+#' but dbSNP allele resolution failed," while still stopping the pipeline
+#' either way (a PIRA-PCR design cannot proceed without a resolved
+#' alternate allele).
+#'
+#' @examples
+#' \dontrun{
+#' result <- locate_snp(gene_seq, flank_seq, rsid = "rs1801133")
+#' result$alleles$alternate_alleles
+#' }
+#'
 #' @export
-locate_snp <- function(gene_seq, flank_seq, snp_offset = 1) {
+locate_snp <- function(gene_seq, flank_seq, snp_offset = 1,
+                        rsid = NULL, species = "human") {
   if (is.character(flank_seq)) {
     flank_seq <- Biostrings::DNAString(flank_seq)
   }
@@ -82,5 +108,13 @@ locate_snp <- function(gene_seq, flank_seq, snp_offset = 1) {
     snp_pos, snp_base, strand_info
   ))
 
-  list(snp_pos = snp_pos, snp_base = snp_base, strand = strand_info)
+  result <- list(snp_pos = snp_pos, snp_base = snp_base, strand = strand_info)
+
+  if (!is.null(rsid)) {
+    result$alleles <- resolve_pira_alleles(
+      snp_base = snp_base, rsid = rsid, species = species
+    )
+  }
+
+  result
 }

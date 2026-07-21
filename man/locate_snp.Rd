@@ -4,7 +4,7 @@
 \alias{locate_snp}
 \title{Locate a SNP using its flanking sequence}
 \usage{
-locate_snp(gene_seq, flank_seq, snp_offset = 1)
+locate_snp(gene_seq, flank_seq, snp_offset = 1, rsid = NULL, species = "human")
 }
 \arguments{
 \item{gene_seq}{\code{Biostrings::DNAString} object with the complete gene
@@ -17,6 +17,16 @@ sequence obtained from dbSNP, immediately preceding the SNP position.}
 match where the SNP is located (default \code{1}, i.e. the base immediately
 following the flank). Adjust only if the flanking-sequence convention
 you are using differs from dbSNP's.}
+
+\item{rsid}{Character. Optional RefSNP identifier (e.g. \code{"rs1801133"}).
+When provided, \code{locate_snp()} additionally calls
+\code{\link[=resolve_pira_alleles]{resolve_pira_alleles()}} to fetch and cross-check the alternate
+allele(s) needed for PIRA-PCR primer design (requires internet access).
+When \code{NULL} (the default), behavior is unchanged from previous versions
+of this function.}
+
+\item{species}{Character. Passed to \code{\link[=resolve_pira_alleles]{resolve_pira_alleles()}} when \code{rsid}
+is provided. Default \code{"human"}.}
 }
 \value{
 A list with the elements:
@@ -24,6 +34,9 @@ A list with the elements:
 \item{snp_base}{Nucleotide found at \code{snp_pos}.}
 \item{strand}{\code{"forward"} or \code{"complementary"}, the strand on which the
 flanking sequence match was found.}
+\item{alleles}{Only present when \code{rsid} is supplied: the full result of
+\code{\link[=resolve_pira_alleles]{resolve_pira_alleles()}} (reference/alternate allele(s), strand
+orientation, multiallelic flag, etc.).}
 }
 \description{
 Locates the coordinate of a SNP within a reference gene sequence using
@@ -38,4 +51,19 @@ flanking sequence in the reference sequence. If the flanking sequence
 appears more than once, the first match is used and a warning is
 issued; in that case, using a longer and more specific flanking sequence
 is recommended.
+
+When \code{rsid} is supplied, allele resolution errors (e.g. no internet
+connection, invalid rsID) propagate as errors from \code{locate_snp()} itself
+— the SNP has already been located successfully by that point, so this
+distinguishes "the SNP location logic failed" from "the SNP was located,
+but dbSNP allele resolution failed," while still stopping the pipeline
+either way (a PIRA-PCR design cannot proceed without a resolved
+alternate allele).
+}
+\examples{
+\dontrun{
+result <- locate_snp(gene_seq, flank_seq, rsid = "rs1801133")
+result$alleles$alternate_alleles
+}
+
 }
