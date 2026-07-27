@@ -23,7 +23,10 @@ Imports:
     TmCalculator,
     ggplot2,
     stats,
-    utils
+    utils,
+    httr,
+    jsonlite,
+    methods
 Suggests:
     testthat (>= 3.0.0),
     knitr,
