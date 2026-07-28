@@ -401,9 +401,29 @@ Using the amplicon size and the two fragments from the allele that does
 get cut:
 
 ```r
-simulate_gel(amplicon_size = pcr$size,
-             fragment_sizes = c(146, 38),
-             genotype_labels = c("Homozygous C/C", "Heterozygous C/T", "Homozygous T/T"))
+# 1. Define constants with descriptive names
+PCR_FRAGMENTS <- c(146, 38)
+GENOTYPE_LABELS <- c("Homozygous C/C", "Heterozygous C/T", "Homozygous T/T")
+
+# 2. Encapsulate the logic in a defensive function with validations
+run_gel_simulation <- function(pcr_data) {
+  # Validation of existence and null/NA values
+  if (is.null(pcr_data) || is.null(pcr_data$size) || any(is.na(pcr_data$size))) {
+    stop("Error: The pcr object or its 'size' property is invalid or contains NA values.")
+  }
+  
+  # Execution of the simulation
+  gel_result <- simulate_gel(
+    amplicon_size   = pcr_data$size,
+    fragment_sizes  = PCR_FRAGMENTS,
+    genotype_labels = GENOTYPE_LABELS
+  )
+  
+  return(gel_result)
+}
+
+# 3. Usage of the built function
+# final_simulation <- run_gel_simulation(pcr)
 ```
 
 This produces the virtual gel image with 4 lanes: molecular weight marker,
