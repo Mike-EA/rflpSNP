@@ -217,25 +217,68 @@ compare_tm_conditions <- function(seq_dna, profiles = NULL,
 #' @return Invisible; prints a diagnostic message to the console.
 #' @export
 check_tm_backend <- function() {
-  test_tm <- tryCatch(
-    calc_tm("ATGCGATGCGATGCATGCA"),
-    error = function(e) NA_real_
+  rflp_version <- tryCatch(
+    as.character(utils::packageVersion("rflpSNP")),
+    error = function(e) "development"
   )
 
-  if (is.na(test_tm)) {
-    cat("\n[DIAGNOSTIC rflpSNP] Could not extract Tm automatically.\n")
-    cat("Raw structure returned by TmCalculator::tm_calculate():\n")
-    raw <- tryCatch(
-      TmCalculator::tm_calculate(
-        input_seq = "ATGCGATGCGATGCATGCA",
-        method = "tm_nn", nn_table = "DNA_NN_SantaLucia_2004"
-      ),
-      error = function(e) NULL
-    )
-    utils::str(raw, max.level = 3)
-    cat("[END DIAGNOSTIC] Check the installed version with packageVersion('TmCalculator') and update calc_tm() if necessary.\n\n")
+  tm_version <- tryCatch(
+    as.character(utils::packageVersion("TmCalculator")),
+    error = function(e) "not installed"
+  )
+
+  tm_arguments <- tryCatch(
+    names(formals(TmCalculator::tm_calculate)),
+    error = function(e) character()
+  )
+
+  salt_argument <- intersect(
+    c("salt_corr_method", "salt_method"),
+    tm_arguments
+  )
+
+  cat("\n=== rflpSNP Tm backend check ===\n")
+  cat("R version            :", R.version.string, "\n")
+  cat("rflpSNP version      :", rflp_version, "\n")
+  cat("TmCalculator version :", tm_version, "\n")
+
+  if (length(salt_argument) > 0) {
+    cat("Salt argument        :", salt_argument[1], "\n")
   } else {
-    cat(sprintf("\n[OK] calc_tm() is working correctly; test Tm = %.1f\u00B0C\n\n", test_tm))
+    cat("Salt argument        : not recognized\n")
   }
+
+  test_tm <- tryCatch(
+    calc_tm("ATGCGATGCGATGCATGCA"),
+    error = function(e) {
+      cat("Backend error        :", conditionMessage(e), "\n")
+      NA_real_
+    }
+  )
+
+  if (is.numeric(test_tm) &&
+      length(test_tm) == 1 &&
+      is.finite(test_tm)) {
+    cat(sprintf(
+      "[OK] calc_tm() is working correctly; test Tm = %.1f\u00B0C\n\n",
+      test_tm
+    ))
+  } else {
+    cat("\n[DIAGNOSTIC rflpSNP]\n")
+    cat("The Tm backend did not return a valid numeric value.\n")
+    cat("Validated TmCalculator version: 1.0.8\n")
+    cat("Restart R and reinstall the validated version with:\n\n")
+    cat(
+      'remotes::install_version("TmCalculator", ',
+      'version = "1.0.8", force = TRUE)\n',
+      sep = ""
+    )
+    cat(
+      'remotes::install_github("Mike-EA/rflpSNP@main", ',
+      'force = TRUE)\n\n',
+      sep = ""
+    )
+  }
+
   invisible(test_tm)
 }

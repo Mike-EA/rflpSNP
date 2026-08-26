@@ -20,7 +20,7 @@ Depends: R (>= 4.1.0)
 Imports: 
     Biostrings,
     S4Vectors,
-    TmCalculator,
+    TmCalculator (>= 1.0.8),
     ggplot2,
     stats,
     utils
