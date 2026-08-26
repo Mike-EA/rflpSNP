@@ -98,20 +98,38 @@ Run the following once in the R console:
 
 ```r
 # CRAN dependencies
-install.packages(c("TmCalculator", "ggplot2", "devtools"))
+install.packages(c("remotes", "ggplot2"))
 
 # Bioconductor dependencies
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
   install.packages("BiocManager")
 }
 
-BiocManager::install(c("Biostrings", "S4Vectors"))
+BiocManager::install(
+  c("Biostrings", "S4Vectors", "BSgenome", "GenomicRanges"),
+  ask = FALSE,
+  update = FALSE
+)
+
+# TmCalculator version validated with rflpSNP
+remotes::install_version(
+  "TmCalculator",
+  version = "1.0.8",
+  dependencies = FALSE,
+  upgrade = "never",
+  force = TRUE
+)
 ```
 
 ### Install `rflpSNP`
 
 ```r
-devtools::install_github("Mike-EA/rflpSNP")
+remotes::install_github(
+  "Mike-EA/rflpSNP@arms_pcr",
+  dependencies = FALSE,
+  upgrade = "never",
+  force = TRUE
+)
 ```
 
 ### Load the package
@@ -125,8 +143,12 @@ library(rflpSNP)
 `TmCalculator`'s interface has changed across versions. `rflpSNP` includes a diagnostic function:
 
 ```r
+packageVersion("TmCalculator")
 check_tm_backend()
 ```
+
+The installation is ready when `packageVersion("TmCalculator")` reports
+`1.0.8` and `check_tm_backend()` reports `[OK]`.
 
 A successful installation should report:
 
@@ -134,7 +156,8 @@ A successful installation should report:
 [OK] calc_tm() is working correctly; test Tm = ...
 ```
 
-If a `[DIAGNOSTIC]` message appears, the output can be used to determine whether the installed `TmCalculator` version uses a renamed argument.
+If a `[DIAGNOSTIC]` message appears, follow the reinstall instructions printed
+by `check_tm_backend()` and run the check again in a restarted R session.
 
 ---
 
