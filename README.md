@@ -47,6 +47,8 @@ Depending on the allele, the restriction site may be created or destroyed, produ
 - Simulate expected agarose-gel patterns.
 - Export primer-design reports to text.
 - Run the main PCR-RFLP workflow through a single pipeline function.
+- Design, rank and export tetra-primer ARMS-PCR candidate sets for biallelic SNPs.
+- Simulate ARMS-PCR products and a three-genotype virtual gel.
 
 ---
 
@@ -245,6 +247,42 @@ result$design
 result$pcr_result
 result$restriction_result
 ```
+
+---
+
+## Tetra-primer ARMS-PCR
+
+Use ARMS-PCR when the SNP does not provide a useful restriction-site change.
+The assay contains two outer primers (an amplification control) and two inner
+primers, each specific to one allele. The inner primers end at the SNP and
+carry a deliberate second mismatch near their 3' ends.
+
+```r
+arms <- run_arms_pcr_pipeline(
+  gene_seq,
+  flank_seq = "GAAAAGCTGCGTGATGATGAAATCG",
+  alt_allele = "T",
+  export_txt = TRUE,
+  output_file = "mthfr_arms_pcr.txt"
+)
+
+# Inspect the recommended four-primer set and the three simulated genotypes
+arms$design$best_set
+arms$pcr_result$products
+
+# Display the virtual agarose gel
+arms$gel
+```
+
+The expected lanes contain the external control band plus the diagnostic band
+for the matching allele: `ref/ref` has control + reference, `ref/alt` has all
+three bands, and `alt/alt` has control + alternative. The report contains the
+top ranked candidates, parameters and the predicted sizes.
+
+ARMS-PCR candidates are **not experimentally validated**. Confirm genomic
+specificity, secondary structures, polymerase compatibility (no 3'→5'
+proofreading activity), deliberate mismatch choice and annealing conditions
+before ordering oligonucleotides.
 
 ---
 
