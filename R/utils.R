@@ -1,7 +1,7 @@
-#' rflpSNP: In Silico Design and Simulation of PCR-RFLP Assays
+#' rflpSNP: In Silico Design and Simulation of SNP Genotyping Assays
 #'
 #' The \pkg{rflpSNP} package automates the complete workflow for designing a
-#' PCR-RFLP assay for genotyping a known SNP:
+#' PCR-RFLP or tetra-primer ARMS-PCR assay for genotyping a known SNP:
 #'
 #' \enumerate{
 #'   \item Load a reference sequence (\code{\link{read_gene_fasta}}).
@@ -22,6 +22,9 @@
 #'
 #' The function \code{\link{run_pcr_rflp_pipeline}} chains all of these steps
 #' together for a quick end-to-end workflow.
+#' For SNPs without a useful restriction-site change,
+#' \code{\link{run_arms_pcr_pipeline}} designs four ARMS primers and returns
+#' the report, genotype products and virtual gel.
 #'
 #' @keywords internal
 "_PACKAGE"
@@ -32,5 +35,6 @@
 # false positives of the "no visible binding for global variable" kind.
 utils::globalVariables(c(
   "Column", "Row", "Type", "Base", "Label", "GenPos",
-  "Size", "Condition", "Y_pos", "Intensity", "Lane", "X"
+  "Size", "Condition", "Y_pos", "Intensity", "Lane", "X",
+  "lane", "y", "product", "size_bp"
 ))
