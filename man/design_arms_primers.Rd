@@ -61,7 +61,8 @@ design_arms_primers(
 
 \item{max_candidates_per_pool}{Cap after individual filtering to bound combinatorics.}
 
-\item{max_raw_candidates_per_pool}{Optional cap before physicochemical filtering.}
+\item{max_raw_candidates_per_pool}{Optional cap before physicochemical
+evaluation, useful for fast exploratory searches in very large windows.}
 
 \item{n_top}{Number of highest-ranked sets returned.}
 

@@ -19,3 +19,13 @@ arms_fixture_repeated_flank <- function() {
 arms_fixture_unique_amplicon <- function() {
   Biostrings::DNAString("ATGCGTACCTAGGCTAACGTTGCA")
 }
+
+# Fixed 171 bp window from the FTO rs8050136 reference context. The SNP is C
+# at local coordinate 86 (genomic coordinate 78401 in the source FASTA).
+arms_fixture_fto_rs8050136 <- function() {
+  Biostrings::DNAString(paste0(
+    "GTATTTGATTTCCTTTTCCCTGGGACCTGTGACAGTGCCAGCTTCATAGCCTAGTCTAGGC",
+    "ATGCCAGTTGCCCACTGTGGCAATCAATATCTGAGCCTGTGGTTTTTGCCTTAGGTAAACT",
+    "GTAGAGATGGACTCATGGAATGCTTGGAAAATTTTTCAGTTTATGATAA"
+  ))
+}

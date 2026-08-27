@@ -284,6 +284,22 @@ specificity, secondary structures, polymerase compatibility (no 3'→5'
 proofreading activity), deliberate mismatch choice and annealing conditions
 before ordering oligonucleotides.
 
+### Nucleotide-level product map
+
+After simulating a set, export a reproducible map of every product. It records
+both strands base by base, FASTA coordinates, the SNP and the participating
+primers.
+
+```r
+export_arms_amplicon_map_txt(
+  arms$pcr_result,
+  output_file = "arms_pcr_amplicon_map.txt"
+)
+```
+
+See the complete Spanish-language guide in
+[docs/ARMS_PCR_USER_GUIDE.md](docs/ARMS_PCR_USER_GUIDE.md).
+
 ---
 
 ## Example: MTHFR C677T
