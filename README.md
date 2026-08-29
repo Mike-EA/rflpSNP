@@ -50,39 +50,6 @@ Depending on the allele, the restriction site may be created or destroyed, produ
 
 ---
 
-## Workflow
-
-The package is designed around the following workflow:
-
-```text
-Reference FASTA
-       │
-       ▼
-   Locate SNP
-       │
-       ▼
-  Design primers
-       │
-       ▼
- Simulate PCR
-       │
-       ▼
-Find restriction site
-       │
-       ▼
- Compare alleles
-       │
-       ▼
-Predict fragments
-       │
-       ▼
-Simulate agarose gel
-```
-
-The complete workflow can also be executed through `run_pcr_rflp_pipeline()` once the individual steps are understood.
-
----
-
 ## Installation
 
 ### Requirements
@@ -117,7 +84,7 @@ with `dependencies = FALSE`: that can leave packages such as
 
 `devtools::install_github()` is equivalent for this purpose, but `remotes` is
 used here because it is smaller and is the installation engine used by
-`devtools`. There is no `devtools::github_install()` function.
+`devtools`.
 
 ### Load the package
 

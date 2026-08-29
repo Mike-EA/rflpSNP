@@ -37,5 +37,10 @@ This function assumes there is exactly one relevant match of the
 flanking sequence in the reference sequence. If the flanking sequence
 appears more than once, the first match is used and a warning is
 issued; in that case, using a longer and more specific flanking sequence
-is recommended.
+is recommended. When the flank is found on the complementary strand,
+\code{snp_base} remains the nucleotide present in the loaded FASTA sequence
+(shown 5' to 3'). The function prints a note with the complementary base,
+which is the base in the orientation of the supplied dbSNP flank. If that
+base agrees with the reference allele in the literature, the analysis can
+continue using the returned coordinate and \code{snp_base}.
 }
