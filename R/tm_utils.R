@@ -267,15 +267,10 @@ check_tm_backend <- function() {
     cat("\n[DIAGNOSTIC rflpSNP]\n")
     cat("The Tm backend did not return a valid numeric value.\n")
     cat("Validated TmCalculator version: 1.0.8\n")
-    cat("Restart R and reinstall the validated version with:\n\n")
-    cat(
-      'remotes::install_version("TmCalculator", ',
-      'version = "1.0.8", force = TRUE)\n',
-      sep = ""
-    )
+    cat("Restart R and reinstall rflpSNP with its required dependencies:\n\n")
     cat(
       'remotes::install_github("Mike-EA/rflpSNP@main", ',
-      'force = TRUE)\n\n',
+      'dependencies = NA, upgrade = "never", force = TRUE)\n\n',
       sep = ""
     )
   }

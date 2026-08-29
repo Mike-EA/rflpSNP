@@ -92,45 +92,32 @@ The complete workflow can also be executed through `run_pcr_rflp_pipeline()` onc
 
 `rflpSNP` uses packages from both **CRAN** and **Bioconductor**.
 
-### Install dependencies
+### Install `rflpSNP` and its dependencies
 
-Run the following once in the R console:
+Run the following in a new R session. This is the only installation step
+needed for the workshop:
 
 ```r
-# CRAN dependencies
-install.packages(c("remotes", "ggplot2"))
-
-# Bioconductor dependencies
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager")
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
 }
 
-BiocManager::install(
-  c("Biostrings", "S4Vectors", "BSgenome", "GenomicRanges"),
-  ask = FALSE,
-  update = FALSE
-)
-
-# TmCalculator version validated with rflpSNP
-remotes::install_version(
-  "TmCalculator",
-  version = "1.0.8",
-  dependencies = FALSE,
-  upgrade = "never",
-  force = TRUE
-)
-```
-
-### Install `rflpSNP`
-
-```r
 remotes::install_github(
   "Mike-EA/rflpSNP@main",
-  dependencies = FALSE,
-  upgrade = "never",
-  force = TRUE
+  dependencies = NA,
+  upgrade = "never"
 )
 ```
+
+`dependencies = NA` installs all required dependencies declared in
+`Depends`, `Imports` and `LinkingTo`, including the CRAN and Bioconductor
+packages required by `TmCalculator`. Do not install `TmCalculator` separately
+with `dependencies = FALSE`: that can leave packages such as
+`GenomeInfoDbData` missing.
+
+`devtools::install_github()` is equivalent for this purpose, but `remotes` is
+used here because it is smaller and is the installation engine used by
+`devtools`. There is no `devtools::github_install()` function.
 
 ### Load the package
 
@@ -156,8 +143,9 @@ A successful installation should report:
 [OK] calc_tm() is working correctly; test Tm = ...
 ```
 
-If a `[DIAGNOSTIC]` message appears, follow the reinstall instructions printed
-by `check_tm_backend()` and run the check again in a restarted R session.
+If a `[DIAGNOSTIC]` message appears, restart R and repeat the one-step
+installation command above with `force = TRUE` added to
+`remotes::install_github()`.
 
 ---
 
