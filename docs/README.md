@@ -9,12 +9,12 @@ genotyping assay.
 
 | If you need to… | Read |
 |---|---|
-| Understand the experimental principle and choose a strategy | [Experimental design guide](GUIA_DISENO_EXPERIMENTAL.md) |
+| Understand the experimental principle and choose a strategy | [Experimental design guide](EXPERIMENTAL_DESIGN_GUIDE.md) |
 | Run and review a PCR-RFLP analysis step by step | [PCR-RFLP user guide](PCR_RFLP_USER_GUIDE.md) |
 | Design a tetra-primer assay for an SNP without a useful RFLP | [ARMS-PCR user guide](ARMS_PCR_USER_GUIDE.md) |
-| Distinguish a computational prediction from experimental validation | [Limitations and validation](LIMITACIONES_Y_VALIDACION.md) |
-| Investigate unexpected results or difficult inputs | [Troubleshooting guide](CASOS_PROBLEMATICOS.md) |
-| Tune filters and review reproducible MTHFR/FTO examples | [Parameter tuning and worked examples](PARAMETER_TUNING_AND_WORKED_EXAMPLES.md) |
+| Distinguish a computational prediction from experimental validation | [Limitations and validation](LIMITATIONS_AND_VALIDATION.md) |
+| Investigate unexpected results or difficult inputs | [Troubleshooting guide](TROUBLESHOOTING_GUIDE.md) |
+| Tune filters and review reproducible MTHFR/FTO examples | [Assay-specific parameters and reproducible examples](PARAMETER_TUNING_AND_WORKED_EXAMPLES.md) |
 | Review the coordinate and orientation contract for ARMS-PCR | [ARMS-PCR conventions](ARMS_PCR_CONVENTIONS.md) |
 
 The [ARMS-PCR development plan](ARMS_PCR_PLAN.md) records the historical

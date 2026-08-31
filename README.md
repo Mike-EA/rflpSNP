@@ -63,11 +63,9 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 
-remotes::install_github(
-  "Mike-EA/rflpSNP@main",
-  dependencies = NA,
-  upgrade = "never"
-)
+remotes::install_github("Mike-EA/rflpSNP@main",
+                        dependencies = NA,
+                        upgrade = "never")
 ```
 
 For the ARMS-PCR development branch before it is merged into `main`:
@@ -77,11 +75,9 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 
-remotes::install_github(
-  "Mike-EA/rflpSNP@arms_pcr",
-  dependencies = NA,
-  upgrade = "never"
-)
+remotes::install_github("Mike-EA/rflpSNP@arms_pcr",
+                        dependencies = NA,
+                        upgrade = "never")
 ```
 
 `dependencies = NA` installs dependencies declared in `Depends`, `Imports`
@@ -178,10 +174,8 @@ gene_seq <- read_gene_fasta("MTHFR_completeseq.fa")
 The SNP is located using its flanking sequence:
 
 ```r
-snp <- locate_snp(
-  gene_seq,
-  flank_seq = "GAAAAGCTGCGTGATGATGAAATCG"
-)
+snp <- locate_snp( gene_seq,
+                  flank_seq = "GAAAAGCTGCGTGATGATGAAATCG")
 
 snp$snp_pos
 snp$snp_base
@@ -191,10 +185,8 @@ snp$strand
 ### 3. Design primers
 
 ```r
-design <- design_primers(
-  gene_seq,
-  snp_pos = snp$snp_pos
-)
+design <- design_primers(gene_seq,
+                         snp_pos = snp$snp_pos)
 ```
 
 The resulting object contains the best primer pairs and their relevant characteristics:
@@ -211,11 +203,9 @@ design$n_pairs_total
 ```r
 bp <- design$best_pair
 
-pcr <- simulate_pcr(
-  gene_seq,
-  fwd_primer = bp$forward_seq,
-  rev_primer = bp$reverse_seq
-)
+pcr <- simulate_pcr(gene_seq,
+                    fwd_primer = bp$forward_seq,
+                    rev_primer = bp$reverse_seq)
 ```
 
 ### 5. Find the restriction site
@@ -223,11 +213,9 @@ pcr <- simulate_pcr(
 For the example using *HinfI*:
 
 ```r
-site <- find_restriction_site(
-  pcr,
-  enzyme_motif = "GANTC",
-  cut_offset = 1
-)
+site <- find_restriction_site(pcr,
+                              enzyme_motif = "GANTC",
+                              cut_offset = 1)
 ```
 
 ### 6. Simulate the complete PCR-RFLP workflow
@@ -235,12 +223,10 @@ site <- find_restriction_site(
 Once the individual steps are understood:
 
 ```r
-result <- run_pcr_rflp_pipeline(
-  gene_seq,
-  flank_seq = "GAAAAGCTGCGTGATGATGAAATCG",
-  enzyme_motif = "GANTC",
-  cut_offset = 1
-)
+result <- run_pcr_rflp_pipeline(gene_seq,
+                                flank_seq = "GAAAAGCTGCGTGATGATGAAATCG",
+                                enzyme_motif = "GANTC",
+                                cut_offset = 1)
 
 result$snp
 result$design
@@ -258,13 +244,11 @@ primers, each specific to one allele. The inner primers end at the SNP and
 carry a deliberate second mismatch near their 3' ends.
 
 ```r
-arms <- run_arms_pcr_pipeline(
-  gene_seq,
-  flank_seq = "GAAAAGCTGCGTGATGATGAAATCG",
-  alt_allele = "T",
-  export_txt = TRUE,
-  output_file = "mthfr_arms_pcr.txt"
-)
+arms <- run_arms_pcr_pipeline(gene_seq,
+                              flank_seq = "GAAAAGCTGCGTGATGATGAAATCG",
+                              alt_allele = "T",
+                              export_txt = TRUE,
+                              output_file = "mthfr_arms_pcr.txt")
 
 # Inspect the recommended four-primer set and the three simulated genotypes
 arms$design$best_set
@@ -291,10 +275,8 @@ both strands base by base, FASTA coordinates, the SNP and the participating
 primers.
 
 ```r
-export_arms_amplicon_map_txt(
-  arms$pcr_result,
-  output_file = "arms_pcr_amplicon_map.txt"
-)
+export_arms_amplicon_map_txt(arms$pcr_result,
+                             output_file = "arms_pcr_amplicon_map.txt")
 ```
 
 See the complete ARMS-PCR guide in
@@ -346,37 +328,29 @@ Use the simulated amplicon and restriction-site result to display primer
 placement, the candidate cut site, and predicted digestion products.
 
 ```r
-map <- plot_amplicon_map(
-  pcr,
-  bp$forward_seq,
-  bp$reverse_seq,
-  site,
-  enzyme_name = "HinfI"
-)
+map <- plot_amplicon_map(pcr,
+                         bp$forward_seq,
+                         bp$reverse_seq,
+                         site,
+                         enzyme_name = "HinfI")
 ```
 
 For a nucleotide-level PCR-RFLP view:
 
 ```r
-plot_sequence_map(
-  pcr,
-  site,
-  enzyme_name = "HinfI"
-)
+plot_sequence_map(pcr,
+                  site,
+                  enzyme_name = "HinfI")
 ```
 
 Render the expected PCR-RFLP genotype patterns:
 
 ```r
-simulate_gel(
-  amplicon_size = pcr$size,
-  fragment_sizes = c(146, 38),
-  genotype_labels = c(
-    "Homozygous C/C",
-    "Heterozygous C/T",
-    "Homozygous T/T"
-  )
-)
+simulate_gel(amplicon_size = pcr$size,
+             fragment_sizes = c(146, 38),
+             genotype_labels = c("Homozygous C/C",
+                                 "Heterozygous C/T",
+                                 "Homozygous T/T"))
 ```
 
 ### Tetra-primer ARMS-PCR visualization
@@ -393,10 +367,7 @@ For a reproducible, nucleotide-level representation of each ARMS-PCR product,
 export its coordinates, strands, SNP, and participating primers:
 
 ```r
-export_arms_amplicon_map_txt(
-  arms$pcr_result,
-  output_file = "arms_pcr_amplicon_map.txt"
-)
+export_arms_amplicon_map_txt(arms$pcr_result, output_file = "arms_pcr_amplicon_map.txt")
 ```
 
 ---
@@ -429,7 +400,7 @@ with independent specificity and thermodynamic checks.
 | Search breadth | `max_candidates_per_pool = 20`, `max_raw_candidates_per_pool = Inf`, `n_top = 5` | Bounds combinatorial search time. Broaden candidate pools before relaxing specificity or product-separation criteria. |
 | Tm chemistry | `Na = 100`, `Mg = 2`, `dNTPs = 0.2`, `oligo_conc_nM = 500` | Uses the same chemistry assumptions as PCR-RFLP; change them when the planned reaction mixture differs. |
 
-See the [parameter-tuning guide](docs/PARAMETER_TUNING_AND_WORKED_EXAMPLES.md)
+See the [assay-specific parameter guide](docs/PARAMETER_TUNING_AND_WORKED_EXAMPLES.md)
 for reproducible MTHFR PCR-RFLP and FTO ARMS-PCR examples using non-default
 settings.
 
@@ -450,7 +421,7 @@ If `simulate_pcr()` reports multiple potential binding sites, primer specificity
 
 For the complete scope, computational assumptions, experimental checklist and
 responsible-use statement, see
-[docs/LIMITACIONES_Y_VALIDACION.md](docs/LIMITACIONES_Y_VALIDACION.md).
+[docs/LIMITATIONS_AND_VALIDATION.md](docs/LIMITATIONS_AND_VALIDATION.md).
 
 ---
 
@@ -463,11 +434,11 @@ teaching and research use:
 | Resource | Use it for |
 |---|---|
 | [Documentation index](docs/README.md) | Choose a route through the guides |
-| [Experimental design guide](docs/GUIA_DISENO_EXPERIMENTAL.md) | Select a strategy, prepare inputs and plan controls |
+| [Experimental design guide](docs/EXPERIMENTAL_DESIGN_GUIDE.md) | Select a strategy, prepare inputs and plan controls |
 | [PCR-RFLP user guide](docs/PCR_RFLP_USER_GUIDE.md) | Run and review the PCR-RFLP workflow step by step |
 | [ARMS-PCR user guide](docs/ARMS_PCR_USER_GUIDE.md) | Design and simulate tetra-primer ARMS-PCR assays |
-| [Limitations and validation](docs/LIMITACIONES_Y_VALIDACION.md) | Separate in-silico predictions from experimental evidence |
-| [Troubleshooting guide](docs/CASOS_PROBLEMATICOS.md) | Investigate ambiguous inputs and results |
+| [Limitations and validation](docs/LIMITATIONS_AND_VALIDATION.md) | Separate in-silico predictions from experimental evidence |
+| [Troubleshooting guide](docs/TROUBLESHOOTING_GUIDE.md) | Investigate ambiguous inputs and results |
 
 ---
 

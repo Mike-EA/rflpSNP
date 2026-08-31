@@ -1,4 +1,4 @@
-# Troubleshooting guide
+# Troubleshooting Guide
 
 Keep the error message, arguments, and FASTA provenance before changing a
 parameter. Unrecorded changes make design attempts difficult to compare.

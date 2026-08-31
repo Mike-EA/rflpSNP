@@ -1,4 +1,4 @@
-# Experimental design guide for SNP genotyping
+# Experimental Design Guide for SNP Genotyping
 
 This guide places `rflpSNP` computational analysis within experimental assay
 design. The package generates reproducible candidates; biological judgement,
@@ -86,7 +86,7 @@ patterns will be accepted, when an ambiguous band will be repeated, and how a
 discrepancy will be confirmed.
 
 Band intensity, partial digestion, degraded DNA, inhibitors, concentration
-variation, and gel resolution can alter a real sample. The [limitations guide](LIMITACIONES_Y_VALIDACION.md)
+variation, and gel resolution can alter a real sample. The [limitations guide](LIMITATIONS_AND_VALIDATION.md)
 explains these differences between simulation and laboratory work.
 
 ## 7. Preserve traceability

@@ -1,8 +1,8 @@
 # PCR-RFLP user guide
 
 This guide describes a PCR-RFLP workflow in `rflpSNP`. It is intended for
-known SNPs and a verifiable reference sequence. Read the [experimental design guide](GUIA_DISENO_EXPERIMENTAL.md)
-and [limitations](LIMITACIONES_Y_VALIDACION.md) first.
+known SNPs and a verifiable reference sequence. Read the [experimental design guide](EXPERIMENTAL_DESIGN_GUIDE.md)
+and [limitations](LIMITATIONS_AND_VALIDATION.md) first.
 
 ## Requirements and inputs
 
@@ -102,6 +102,6 @@ result <- run_pcr_rflp_pipeline(
 
 The result contains `snp`, `design`, `pcr_result`, and `restriction_result`.
 If the motif is absent from the reference allele, model and review the alternate
-allele explicitly. See the [troubleshooting guide](CASOS_PROBLEMATICOS.md) and
-complete the [validation checklist](LIMITACIONES_Y_VALIDACION.md) before
+allele explicitly. See the [troubleshooting guide](TROUBLESHOOTING_GUIDE.md) and
+complete the [validation checklist](LIMITATIONS_AND_VALIDATION.md) before
 ordering oligonucleotides.

@@ -1,4 +1,4 @@
-# Limitations and validation
+# Limitations and Validation
 
 `rflpSNP` produces *in silico* designs and predictions. A valid result is a
 traceable assay hypothesis, not evidence that a reaction will work or that a
