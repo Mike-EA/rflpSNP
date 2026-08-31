@@ -4,3 +4,10 @@
 ^\.claude$
 ^LICENSE\.md$
 ^\.github$
+^docs$
+^CITATION\.cff$
+^\.Rhistory$
+^arms_test\.r$
+^.*_ARMS_PCR\.txt$
+^material_taller_MTHFR_temporal$
+^\.tmp_

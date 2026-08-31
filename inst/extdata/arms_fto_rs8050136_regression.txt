@@ -1,0 +1,25 @@
+FTO rs8050136 ARMS-PCR regression case
+=======================================
+
+Reference window: 171 bp, derived from the local FTO reference context.
+Reference SNP coordinate in this window: 86
+Reference allele: C
+Alternative allele: A
+Flanking sequence: CATGCCAGTTGCCCACTGTGGCAAT
+
+Exploratory design parameters:
+outer_flank = 85; outer length = 20; inner length = 18:20
+Tm = 55:72 C; GC = 35:65 percent
+self-dimer threshold = -8; hairpin threshold = -6
+cross-dimer threshold = -9; control product = 150:200 bp
+allele product = 80:150 bp; minimum band separation = 20 bp
+max_candidates_per_pool = 8; max_raw_candidates_per_pool = 8
+
+Expected recommended set:
+outer forward: GTATTTGATTTCCTTTTCCC
+outer reverse: TTTCCAAGCATTCCATGAGT
+reference inner: AACCACAGGCTCAGATAATG
+alternative inner: TTGCCCACTGTGGCTATA
+
+Expected products (bp): control 152; reference 105; alternative 84.
+This is an in-silico regression fixture, not experimental validation.

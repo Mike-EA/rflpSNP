@@ -1,52 +1,61 @@
 # `rflpSNP`
 
-### In silico design and simulation of PCR-RFLP assays for SNP genotyping
+### In silico design and simulation of PCR-RFLP and ARMS-PCR assays for SNP genotyping
 
-> `rflpSNP` is an R package for designing and simulating PCR-RFLP assays for genotyping known SNPs, from a reference sequence and SNP flanking sequence through primer design, in-silico PCR, restriction-site analysis, and virtual agarose-gel prediction.
+> `rflpSNP` is an R package for designing and simulating PCR-RFLP and tetra-primer ARMS-PCR assays for known-SNP genotyping. It supports a traceable workflow from a reference sequence and SNP flanking sequence through primer design, in-silico product analysis, and virtual agarose-gel prediction.
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/Mike-EA/rflpSNP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Mike-EA/rflpSNP/actions/workflows/R-CMD-check.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://Mike-EA.github.io/rflpSNP/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21425389.svg)](https://doi.org/10.5281/zenodo.21425389)
 <!-- badges: end -->
 
 ---
 
-![Flujo de trabajo de rflpSNP](man/images/workflow.png)
+![rflpSNP workflow: PCR-RFLP and ARMS-PCR decision paths](man/images/workflow-v3.png)
 
 ## Overview
 
-A **PCR-RFLP** (*Restriction Fragment Length Polymorphism*) assay can be used to determine the genotype of a known SNP without sequencing. The target region is amplified by PCR and then digested with a restriction enzyme whose recognition site is affected by the SNP.
+`rflpSNP` supports two complementary strategies for genotyping a known biallelic SNP. The workflow figure summarizes their shared preparation steps and the decision that separates them.
 
-Depending on the allele, the restriction site may be created or destroyed, producing different fragment patterns on an agarose gel.
+**PCR-RFLP** (*Restriction Fragment Length Polymorphism*) amplifies a region around the SNP and uses a restriction enzyme whose recognition site is created or abolished by one allele. The simulated digest predicts the allele-dependent fragment pattern expected after electrophoresis.
 
-| Genotype | Expected gel pattern |
-|---|---|
-| Homozygous without the cut site | 1 band — full, uncut amplicon |
-| Heterozygous | 3 bands — full amplicon + 2 fragments |
-| Homozygous with the cut site | 2 bands — the 2 fragments |
+**Tetra-primer ARMS-PCR** is the alternative when no useful restriction-site change is available. It combines two outer control primers with two inner allele-specific primers. The simulated products predict a control band and diagnostic products for the reference and alternative alleles.
 
-`rflpSNP` automates the **in-silico design and simulation of this workflow**, without requiring commercial software such as Primer3Plus or SnapGene.
+Both routes begin with a reference FASTA sequence and a dbSNP flanking sequence, then locate the SNP, design primers, simulate products, and visualize expected genotype patterns.
 
-> **Important:** `rflpSNP` produces candidate designs for computational evaluation. Experimental validation is still required. Primer candidates should be checked with a specialized tool such as IDT OligoAnalyzer before synthesis, and primer specificity should be independently verified.
+> **Important:** `rflpSNP` produces candidate designs for computational evaluation. It does not establish genomic specificity, experimental performance, or a biological genotype. Experimental validation is required; check primers with a specialized tool such as IDT OligoAnalyzer and independently verify specificity before synthesis.
 
 ---
 
 ## Features
 
-- Locate a known SNP within a reference DNA sequence using a dbSNP flanking sequence.
-- Define a working region around the SNP.
-- Generate and filter forward/reverse primer candidates.
-- Evaluate primer melting temperature (Tm) and GC content.
-- Evaluate dimer and hairpin risk using heuristic criteria.
-- Select and rank compatible primer pairs.
-- Simulate PCR amplification in silico.
-- Locate restriction-enzyme recognition sites in the amplicon.
-- Simulate the alternate allele and compare restriction patterns.
-- Generate amplicon and sequence maps.
-- Simulate expected agarose-gel patterns.
-- Export primer-design reports to text.
-- Run the main PCR-RFLP workflow through a single pipeline function.
+| Capability | PCR-RFLP workflow | Tetra-primer ARMS-PCR workflow |
+|---|---|---|
+| Shared input preparation | Locates a known SNP in a reference FASTA with a dbSNP flanking sequence and records its coordinate and strand. | Locates the same SNP and defines the reference and alternative alleles. |
+| Primer design | Generates, filters, ranks, and exports compatible forward/reverse primer pairs. | Generates, filters, ranks, and exports four-primer sets with outer control and inner allele-specific primers. |
+| Candidate evaluation | Evaluates Tm, GC content, and heuristic dimer/hairpin risk; reports alternative primer pairs. | Applies the same physicochemical screening to every primer and checks the intentional inner-primer 3' mismatch pattern. |
+| Product simulation | Simulates the PCR amplicon, restriction sites, alternate allele, and predicted digest fragments. | Simulates control, reference-specific, and alternative-specific products for all three genotypes. |
+| Visualization | Produces amplicon and sequence maps plus a virtual agarose gel for the digest pattern. | Produces a virtual agarose gel and exports nucleotide-level maps of simulated products. |
+| Reproducibility | Exports primer reports and runs the workflow with `run_pcr_rflp_pipeline()`. | Exports primer and amplicon-map reports and runs the workflow with `run_arms_pcr_pipeline()`. |
+
+### Export a design report for experimental review
+
+After a valid design is found, save it as a plain-text report that can be
+reviewed, shared, and archived with the assay record. Use
+`export_primers_txt()` for PCR-RFLP designs and `export_arms_primers_txt()` for
+tetra-primer ARMS-PCR designs. Both reports identify the recommended design and
+retain the highest-ranked alternatives; the PCR-RFLP report includes primer
+sequences, Tm, GC content, expected amplicon and estimated fragments, whereas
+the ARMS-PCR report also records the four-primer layout, predicted genotype
+bands, and design parameters.
+
+The text report is a practical design record, not a synthesis order or a
+substitute for laboratory validation. Archive it with the reference FASTA and
+its accession/assembly, SNP and allele orientation, restriction-enzyme details
+(for PCR-RFLP), package version, and the results of independent specificity and
+oligonucleotide-quality checks.
 
 ---
 
@@ -61,8 +70,9 @@ Depending on the allele, the restriction site may be created or destroyed, produ
 
 ### Install `rflpSNP` and its dependencies
 
-Run the following in a new R session. This is the only installation step
-needed for the workshop:
+Run the following commands in a new R session. They install
+the CRAN and Bioconductor packages declared by `rflpSNP`; no separate manual
+installation of `TmCalculator` or Bioconductor packages is required.
 
 ```r
 if (!requireNamespace("remotes", quietly = TRUE)) {
@@ -110,9 +120,50 @@ A successful installation should report:
 [OK] calc_tm() is working correctly; test Tm = ...
 ```
 
-If a `[DIAGNOSTIC]` message appears, restart R and repeat the one-step
-installation command above with `force = TRUE` added to
-`remotes::install_github()`.
+If a `[DIAGNOSTIC]` message appears, restart R and repeat the installation
+command above with `force = TRUE` added to `remotes::install_github()`.
+
+---
+
+## Preparing the inputs
+
+Prepare the following information before starting either workflow.
+
+### Reference sequence
+
+Provide a `.fa`, `.fasta`, or `.fna` file containing the target region in
+5'→3' orientation. It must include sufficient sequence on both sides of the
+SNP to support the requested primer-search geometry.
+
+```text
+>NC_000001.11 MTHFR gene region
+ATGGTGTCTGCGGGAGTCTGCAGTTCCCGGTGTAAAATCAGGGCAGTGAC...
+```
+
+The current guide uses [NCBI Nucleotide](https://www.ncbi.nlm.nih.gov/nuccore)
+as an example source. Record the accession and assembly used for reproducibility.
+
+### dbSNP flanking sequence and alleles
+
+Obtain a flank immediately preceding the SNP from its
+[dbSNP](https://www.ncbi.nlm.nih.gov/snp/) record. `rflpSNP` uses this sequence
+as an anchor to locate the SNP coordinate in the reference FASTA. For
+ARMS-PCR, also provide the alternative allele explicitly; confirm that both
+alleles are reported in the same orientation as the loaded FASTA.
+
+### Restriction-enzyme motif for PCR-RFLP
+
+PCR-RFLP additionally requires an enzyme whose recognition site overlaps the
+polymorphism. Supply its recognition motif in IUPAC notation and its cleavage
+offset. For example, *HinfI* uses:
+
+```text
+G^ANTC
+```
+
+Useful IUPAC codes include `N` (any base), `R` (A or G), `Y` (C or T), `W` (A
+or T), and `S` (C or G). Confirm the enzyme motif and cleavage convention with
+the supplier documentation before designing the assay.
 
 ---
 
@@ -131,10 +182,8 @@ gene_seq <- read_gene_fasta("MTHFR_completeseq.fa")
 The SNP is located using its flanking sequence:
 
 ```r
-snp <- locate_snp(
-  gene_seq,
-  flank_seq = "GAAAAGCTGCGTGATGATGAAATCG"
-)
+snp <- locate_snp( gene_seq,
+                  flank_seq = "GAAAAGCTGCGTGATGATGAAATCG")
 
 snp$snp_pos
 snp$snp_base
@@ -144,10 +193,8 @@ snp$strand
 ### 3. Design primers
 
 ```r
-design <- design_primers(
-  gene_seq,
-  snp_pos = snp$snp_pos
-)
+design <- design_primers(gene_seq,
+                         snp_pos = snp$snp_pos)
 ```
 
 The resulting object contains the best primer pairs and their relevant characteristics:
@@ -159,47 +206,110 @@ design$best_pair
 design$n_pairs_total
 ```
 
-### 4. Simulate PCR
+### 4. Export the primer-design report
+
+Save the recommended pair and the ranked alternatives before moving on to the
+simulation. The returned path identifies the TXT file written to the working
+directory (or use a full path in `output_file`).
+
+```r
+report_file <- export_primers_txt(
+  design,
+  output_file = "mthfr_pcr_rflp_primer_report.txt"
+)
+```
+
+The report is intended for experimental review: inspect the recommended primer
+sequences, Tm/GC values, amplicon size, estimated fragments, and alternative
+pairs. Confirm the actual restriction cut after simulating the amplicon.
+
+### 5. Simulate PCR
 
 ```r
 bp <- design$best_pair
 
-pcr <- simulate_pcr(
-  gene_seq,
-  fwd_primer = bp$forward_seq,
-  rev_primer = bp$reverse_seq
-)
+pcr <- simulate_pcr(gene_seq,
+                    fwd_primer = bp$forward_seq,
+                    rev_primer = bp$reverse_seq)
 ```
 
-### 5. Find the restriction site
+### 6. Find the restriction site
 
 For the example using *HinfI*:
 
 ```r
-site <- find_restriction_site(
-  pcr,
-  enzyme_motif = "GANTC",
-  cut_offset = 1
-)
+site <- find_restriction_site(pcr,
+                              enzyme_motif = "GANTC",
+                              cut_offset = 1)
 ```
 
-### 6. Simulate the complete PCR-RFLP workflow
+### 7. Simulate the complete PCR-RFLP workflow
 
 Once the individual steps are understood:
 
 ```r
-result <- run_pcr_rflp_pipeline(
-  gene_seq,
-  flank_seq = "GAAAAGCTGCGTGATGATGAAATCG",
-  enzyme_motif = "GANTC",
-  cut_offset = 1
-)
+result <- run_pcr_rflp_pipeline(gene_seq,
+                                flank_seq = "GAAAAGCTGCGTGATGATGAAATCG",
+                                enzyme_motif = "GANTC",
+                                cut_offset = 1)
 
 result$snp
 result$design
 result$pcr_result
 result$restriction_result
 ```
+
+`run_pcr_rflp_pipeline()` writes this same TXT report by default. Set
+`export_txt = FALSE` only when an on-disk report is not wanted, or provide an
+`output_file` to choose its name and location.
+
+---
+
+## Tetra-primer ARMS-PCR
+
+Use ARMS-PCR when the SNP does not provide a useful restriction-site change.
+The assay contains two outer primers (an amplification control) and two inner
+primers, each specific to one allele. The inner primers end at the SNP and
+carry a deliberate second mismatch near their 3' ends.
+
+```r
+arms <- run_arms_pcr_pipeline(gene_seq,
+                              flank_seq = "GAAAAGCTGCGTGATGATGAAATCG",
+                              alt_allele = "T",
+                              export_txt = TRUE,
+                              output_file = "mthfr_arms_pcr.txt")
+
+# Inspect the recommended four-primer set and the three simulated genotypes
+arms$design$best_set
+arms$pcr_result$products
+
+# Display the virtual agarose gel
+arms$gel
+```
+
+The expected lanes contain the external control band plus the diagnostic band
+for the matching allele: `ref/ref` has control + reference, `ref/alt` has all
+three bands, and `alt/alt` has control + alternative. The report contains the
+top ranked candidates, parameters and the predicted sizes.
+
+ARMS-PCR candidates are **not experimentally validated**. Confirm genomic
+specificity, secondary structures, polymerase compatibility (no 3'→5'
+proofreading activity), deliberate mismatch choice and annealing conditions
+before ordering oligonucleotides.
+
+### Nucleotide-level product map
+
+After simulating a set, export a reproducible map of every product. It records
+both strands base by base, FASTA coordinates, the SNP and the participating
+primers.
+
+```r
+export_arms_amplicon_map_txt(arms$pcr_result,
+                             output_file = "arms_pcr_amplicon_map.txt")
+```
+
+See the complete ARMS-PCR guide in
+[docs/ARMS_PCR_USER_GUIDE.md](docs/ARMS_PCR_USER_GUIDE.md).
 
 ---
 
@@ -237,124 +347,91 @@ The selected design stores information such as:
 
 ## Visualization
 
-`rflpSNP` can generate visual representations of the predicted assay.
+`rflpSNP` returns `ggplot` objects for virtual gels and maps suitable for
+inspection or saving with `ggplot2::ggsave()`. The available visualization
+depends on the selected assay type.
 
-### Amplicon map
+### PCR-RFLP visualization
 
-```r
-map <- plot_amplicon_map(
-  pcr,
-  bp$forward_seq,
-  bp$reverse_seq,
-  site,
-  enzyme_name = "HinfI"
-)
-```
-
-### Sequence map
+Use the simulated amplicon and restriction-site result to display primer
+placement, the candidate cut site, and predicted digestion products.
 
 ```r
-plot_sequence_map(
-  pcr,
-  site,
-  enzyme_name = "HinfI"
-)
+map <- plot_amplicon_map(pcr,
+                         bp$forward_seq,
+                         bp$reverse_seq,
+                         site,
+                         enzyme_name = "HinfI")
 ```
 
-### Virtual agarose gel
+For a nucleotide-level PCR-RFLP view:
 
 ```r
-simulate_gel(
-  amplicon_size = pcr$size,
-  fragment_sizes = c(146, 38),
-  genotype_labels = c(
-    "Homozygous C/C",
-    "Heterozygous C/T",
-    "Homozygous T/T"
-  )
-)
+plot_sequence_map(pcr,
+                  site,
+                  enzyme_name = "HinfI")
 ```
 
-The resulting plots are `ggplot` objects and can be saved with `ggplot2::ggsave()`.
+Render the expected PCR-RFLP genotype patterns:
+
+```r
+simulate_gel(amplicon_size = pcr$size,
+             fragment_sizes = c(146, 38),
+             genotype_labels = c("Homozygous C/C",
+                                 "Heterozygous C/T",
+                                 "Homozygous T/T"))
+```
+
+### Tetra-primer ARMS-PCR visualization
+
+The ARMS-PCR simulator produces all control and allele-specific products for
+the three genotypes. Pass that result directly to the ARMS gel simulator:
+
+```r
+arms_gel <- simulate_arms_gel(arms$pcr_result)
+arms_gel
+```
+
+For a reproducible, nucleotide-level representation of each ARMS-PCR product,
+export its coordinates, strands, SNP, and participating primers:
+
+```r
+export_arms_amplicon_map_txt(arms$pcr_result, output_file = "arms_pcr_amplicon_map.txt")
+```
 
 ---
 
 ## Primer-design parameters
 
-`design_primers()` provides adjustable criteria for controlling the search.
+The two design functions use different acceptance criteria. Tune one group at
+a time, retain the reported `parameters` object, and confirm any selected set
+with independent specificity and thermodynamic checks.
 
-| Parameter | Default | What it controls |
-|---|---:|---|
-| `upstream`, `downstream` | `160`, `200` | Size of the search region around the SNP |
-| `length_min`, `length_max` | `18`, `24` | Primer length in bp |
-| `tm_min`, `tm_max` | `50`, `65` | Acceptable Tm range |
-| `gc_min`, `gc_max` | `35`, `65` | Acceptable GC-content range |
-| `tm_diff_max` | `5` | Maximum Tm difference |
-| `amplicon_min`, `amplicon_max` | `150`, `300` | Acceptable amplicon size |
-| `min_fragment_diff` | `25` | Minimum difference between cut fragments |
-| `max_small_fragment` | `100` | Maximum size of the smaller fragment |
-| `min_fragment_size` | `40` | Minimum size of the smaller fragment |
-| `n_top` | `5` | Number of top primer pairs reported |
+### PCR-RFLP: `design_primers()`
 
-For example:
+| Parameter group | Parameters (defaults) | Purpose for a clean PCR-RFLP design |
+|---|---|---|
+| Search geometry | `upstream = 160`, `downstream = 200`, `min_distance_to_snp = 20` | Defines the sequence available to each primer and keeps primer-binding sites away from the SNP. Expand an asymmetric window when the local sequence is constrained. |
+| Individual primers | `length_min = 18`, `length_max = 24`; `tm_min = 50`, `tm_max = 65`; `gc_min = 35`, `gc_max = 65` | Retains primers with practical length, melting-temperature, and GC-content ranges. |
+| Pair compatibility | `tm_diff_max = 5` | Limits the difference between forward and reverse primer Tm. A smaller value can improve annealing compatibility but narrows the search. |
+| Amplicon and digest | `amplicon_min = 150`, `amplicon_max = 300`; `min_fragment_diff = 25`; `max_small_fragment = 100`; `min_fragment_size = 40` | Favors a practical amplicon and digestion fragments that can be distinguished on an agarose gel. Verify the actual enzyme cut after simulation. |
+| Search breadth | `max_candidates_per_strand = 40`, `n_top = 5`, `verbose = TRUE` | Controls how many filtered candidates are paired and how many alternatives are returned. Increase the candidate cap before relaxing biochemical limits. |
+| Tm chemistry | `Na = 100`, `Mg = 2`, `dNTPs = 0.2`, `oligo_conc_nM = 500` | Sets the conditions used for Tm calculations; match them to the intended PCR mixture. |
 
-```r
-design <- design_primers(
-  gene_seq,
-  snp_pos = snp$snp_pos,
-  amplicon_max = 400,
-  min_fragment_diff = 15
-)
-```
+### Tetra-primer ARMS-PCR: `design_arms_primers()`
 
----
+| Parameter group | Parameters (defaults) | Purpose for a clean ARMS-PCR design |
+|---|---|---|
+| Four-primer geometry | `outer_flank = 160`; outer and inner lengths `18`–`24`; `mismatch_positions = c(2, 3)` | Defines outer control primers and allele-specific inner primers. The deliberate mismatch positions govern the additional 3' discrimination required by ARMS-PCR. |
+| Individual-primer chemistry | `tm_min = 50`, `tm_max = 65`; `gc_min = 35`, `gc_max = 65`; `dimer_dg_min = -6`, `hairpin_dg_min = -6` | Filters every outer and inner primer by Tm, GC content, and heuristic self-structure risk. |
+| Four-primer compatibility | `heterodimer_dg_min = -6` | Rejects sets with an unfavorable heuristic cross-dimer score among any pair of the four primers. |
+| Product and gel separation | `control_amplicon_min = 150`, `control_amplicon_max = 500`; `allele_amplicon_min = 80`, `allele_amplicon_max = 400`; `min_band_diff = 25` | Requires a control product, two diagnostic products, and enough separation between all predicted bands for interpretation. |
+| Search breadth | `max_candidates_per_pool = 20`, `max_raw_candidates_per_pool = Inf`, `n_top = 5` | Bounds combinatorial search time. Broaden candidate pools before relaxing specificity or product-separation criteria. |
+| Tm chemistry | `Na = 100`, `Mg = 2`, `dNTPs = 0.2`, `oligo_conc_nM = 500` | Uses the same chemistry assumptions as PCR-RFLP; change them when the planned reaction mixture differs. |
 
-## Preparing the inputs
-
-Before running the workflow, three main inputs are required.
-
-### Reference sequence
-
-A `.fa` or `.fasta` sequence containing the region of interest:
-
-```text
->NC_000001.11 MTHFR gene region
-ATGGTGTCTGCGGGAGTCTGCAGTTCCCGGTGTAAAATCAGGGCAGTGAC...
-```
-
-The current guide uses [NCBI Nucleotide](https://www.ncbi.nlm.nih.gov/nuccore) as an example source.
-
-### dbSNP flanking sequence
-
-The sequence immediately preceding the SNP on the reference strand can be obtained from the SNP record in [dbSNP](https://www.ncbi.nlm.nih.gov/snp/).
-
-`rflpSNP` uses this sequence as an anchor to locate the SNP coordinate in the reference FASTA.
-
-### Restriction enzyme motif
-
-The recognition motif must be supplied in IUPAC notation.
-
-For example:
-
-```text
-HinfI → GANTC
-```
-
-The corresponding cut position must also be specified. For *HinfI*:
-
-```text
-G^ANTC
-```
-
-Useful IUPAC codes include:
-
-```text
-N = any base
-R = A or G
-Y = C or T
-W = A or T
-S = C or G
-```
+See the [assay-specific parameter guide](docs/PARAMETER_TUNING_AND_WORKED_EXAMPLES.md)
+for reproducible MTHFR PCR-RFLP and FTO ARMS-PCR examples using non-default
+settings.
 
 ---
 
@@ -371,27 +448,27 @@ Before ordering primers:
 
 If `simulate_pcr()` reports multiple potential binding sites, primer specificity should receive particular attention.
 
+For the complete scope, computational assumptions, experimental checklist and
+responsible-use statement, see
+[docs/LIMITATIONS_AND_VALIDATION.md](docs/LIMITATIONS_AND_VALIDATION.md).
+
 ---
 
-## User guide
+## Documentation
 
-The complete step-by-step guide covers:
+The README is a quick entry point. The extended documentation supports
+experimental planning, reproducible analysis and interpretation for both
+teaching and research use:
 
-- Reference sequence preparation
-- SNP localization
-- Working-region definition
-- Primer generation and filtering
-- Tm comparison
-- PCR simulation
-- Restriction-site analysis
-- Alternate-allele simulation
-- Amplicon and sequence visualization
-- Virtual gel simulation
-- Troubleshooting
-- Bioinformatics glossary
-- Detailed parameter explanations
-
-> **Full user guide:** `docs/user-guide.md` *(planned)*
+| Resource | Use it for |
+|---|---|
+| [Documentation index](docs/README.md) | Choose a route through the guides |
+| [Experimental design guide](docs/EXPERIMENTAL_DESIGN_GUIDE.md) | Select a strategy, prepare inputs and plan controls |
+| [PCR-RFLP user guide](docs/PCR_RFLP_USER_GUIDE.md) | Run and review the PCR-RFLP workflow step by step |
+| [ARMS-PCR user guide](docs/ARMS_PCR_USER_GUIDE.md) | Design and simulate tetra-primer ARMS-PCR assays |
+| [Assay-specific parameters and reproducible examples](docs/PARAMETER_TUNING_AND_WORKED_EXAMPLES.md) | Reproduce the MTHFR and FTO workflows, including their TXT design records |
+| [Limitations and validation](docs/LIMITATIONS_AND_VALIDATION.md) | Separate in-silico predictions from experimental evidence |
+| [Troubleshooting guide](docs/TROUBLESHOOTING_GUIDE.md) | Investigate ambiguous inputs and results |
 
 ---
 
@@ -445,11 +522,14 @@ SOFTWARE.
 
 ## Citation
 
-> cff-version: 1.2.0
+If you use `rflpSNP`, cite the release-specific Zenodo record:
 
-If you use this software, please cite it as below.
+Esparza Armenta, M. (2026). *rflpSNP: An open-source R pipeline for PCR-RFLP
+and ARMS-PCR assay design and in silico simulation* (Version 0.1.1) [Computer
+software]. Zenodo. https://doi.org/10.5281/zenodo.21425389
 
-Esparza Armenta, M. (2026). rflpSNP: An open-source R pipeline for RFLP primer design and in silico gel simulation (Version 0.1.0) [Computer software]. https://github.com/Mike-EA/rflpSNP
+The package citation is maintained in [`inst/CITATION`](inst/CITATION), so it
+is also available from R with `citation("rflpSNP")`.
 
 ---
 
@@ -461,6 +541,6 @@ Esparza Armenta, M. (2026). rflpSNP: An open-source R pipeline for RFLP primer d
 
 ### Project status
 
-`rflpSNP` is being developed as a tool for the **in-silico design, evaluation, and simulation of PCR-RFLP assays for SNP genotyping**.
+`rflpSNP` is being developed as a tool for the **in-silico design, evaluation, and simulation of PCR-RFLP and tetra-primer ARMS-PCR assays for SNP genotyping**.
 
 Experimental validation remains an essential part of the workflow.

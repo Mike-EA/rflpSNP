@@ -1,16 +1,16 @@
 Package: rflpSNP
-Title: In Silico Design and Simulation of PCR-RFLP Assays for SNP Genotyping
-Version: 0.1.0
+Title: In Silico Design and Simulation of PCR-RFLP and ARMS-PCR Assays for SNP Genotyping
+Version: 0.1.1
 Authors@R: 
     person("Miguel", "Esparza", , "esparzamiguel057@gmail.com", role = c("aut", "cre"))
-Description: Tools to design PCR-RFLP primers from a reference sequence in
-    FASTA format and a dbSNP flanking sequence, evaluate physicochemical
-    properties (Tm, %GC, dimers and hairpins), simulate the PCR in silico on
-    the reference sequence, locate the cut site of a restriction enzyme in
-    the resulting amplicon, and simulate the expected band pattern on an
-    agarose gel for the three possible genotypes (homozygous uncut,
-    heterozygous and homozygous cut). Intended as a teaching and
-    reproducibility tool for the design of PCR-RFLP genotyping assays.
+Author: Miguel Esparza [aut, cre]
+Maintainer: Miguel Esparza <esparzamiguel057@gmail.com>
+Description: Tools to design PCR-RFLP and tetra-primer ARMS-PCR assays from a
+    reference sequence in FASTA format and a dbSNP flanking sequence. It
+    evaluates physicochemical properties (Tm, %GC, dimers and hairpins),
+    simulates PCR products on reference and alternate alleles, and predicts
+    agarose-gel band patterns for the three possible genotypes. Intended as a
+    teaching and reproducibility tool for in-silico SNP genotyping assay design.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

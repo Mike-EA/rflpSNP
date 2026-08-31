@@ -4,10 +4,10 @@
 \name{rflpSNP-package}
 \alias{rflpSNP}
 \alias{rflpSNP-package}
-\title{rflpSNP: In Silico Design and Simulation of PCR-RFLP Assays}
+\title{rflpSNP: In Silico Design and Simulation of SNP Genotyping Assays}
 \description{
 The \pkg{rflpSNP} package automates the complete workflow for designing a
-PCR-RFLP assay for genotyping a known SNP:
+PCR-RFLP or tetra-primer ARMS-PCR assay for genotyping a known SNP:
 }
 \details{
 \enumerate{
@@ -29,6 +29,9 @@ PCR-RFLP assay for genotyping a known SNP:
 
 The function \code{\link{run_pcr_rflp_pipeline}} chains all of these steps
 together for a quick end-to-end workflow.
+For SNPs without a useful restriction-site change,
+\code{\link{run_arms_pcr_pipeline}} designs four ARMS primers and returns
+the report, genotype products and virtual gel.
 }
 \author{
 \strong{Maintainer}: Miguel Esparza \email{esparzamiguel057@gmail.com}
