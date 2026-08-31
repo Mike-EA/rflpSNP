@@ -1,24 +1,28 @@
-# Guía de usuario: tetra-primer ARMS-PCR
+# Tetra-primer ARMS-PCR user guide
 
-Esta guía describe el flujo ARMS-PCR de `rflpSNP` para SNPs bialélicos que no
-cuentan con un cambio de sitio de restricción aprovechable. El resultado es un
-conjunto de cuatro primers, productos esperados para los tres genotipos, un
-reporte de texto, un gel virtual y mapas nucleotídicos reproducibles.
+This guide describes the `rflpSNP` ARMS-PCR workflow for biallelic SNPs without
+a useful restriction-site change. It returns a four-primer set, expected
+products for three genotypes, a text report, a virtual gel, and nucleotide maps.
 
-## Alcance y límites
+Read the [experimental design guide](GUIA_DISENO_EXPERIMENTAL.md) before using
+this workflow. Install the package as described in the [main README](../README.md).
 
-El módulo diseña candidatos *in silico*. No confirma especificidad genómica,
-no sustituye validación termodinámica especializada y no garantiza rendimiento
-experimental. Use una polimerasa sin actividad correctora 3'→5' y valide en
-laboratorio la temperatura de alineamiento y la segunda discrepancia.
+## Scope and limits
 
-## Flujo básico
+The module designs *in silico* candidates. It does not establish genomic
+specificity, replace specialised thermodynamic validation, or guarantee
+experimental performance. Use a polymerase without 3'→5' proofreading activity
+and validate annealing temperature and deliberate mismatch in the laboratory.
+Complete the [validation checklist](LIMITACIONES_Y_VALIDACION.md) before
+synthesis.
+
+## Basic workflow
 
 ```r
-devtools::load_all(".")
+library(rflpSNP)
 
-gene_seq <- read_gene_fasta("referencia.fasta")
-snp <- locate_snp(gene_seq, flank_seq = "SECUENCIA_5_PRIMA_ANTES_DEL_SNP")
+gene_seq <- read_gene_fasta("reference.fasta")
+snp <- locate_snp(gene_seq, flank_seq = "5_PRIME_SEQUENCE_BEFORE_THE_SNP")
 
 design <- design_arms_primers(
   gene_seq,
@@ -30,56 +34,27 @@ design <- design_arms_primers(
 design$best_set
 ```
 
-`ref_allele` siempre debe coincidir con la base de la referencia en
-`snp_pos`; `alt_allele` debe ser la otra base en la misma orientación de la
-referencia FASTA.
+`ref_allele` must match the reference base at `snp_pos`. `alt_allele` must be
+the other base in the same FASTA orientation.
 
-## Interpretar el diseño
+## Interpreting a design
 
-Un resultado válido incluye:
-
-- dos primers externos que producen la banda de control;
-- un interno específico del alelo de referencia;
-- un interno específico del alelo alternativo;
-- tres tamaños: control, referencia y alternativa.
-
-`design$diagnostics` resume el filtrado individual por Tm, GC, auto-dímero y
-hairpin. `design$exclusion_diagnostics` resume por qué los sets completos se
-descartaron. Si `n_valid_sets` es cero, revise primero los pools internos:
+A valid result includes two outer primers for the control band, one reference-
+specific inner primer, one alternate-specific inner primer, and three product
+sizes: control, reference, and alternate. `design$diagnostics` summarises
+individual filtering. If no valid set is found, inspect it together with
+`design$exclusion_diagnostics`.
 
 ```r
 design$diagnostics
 design$exclusion_diagnostics
 ```
 
-## Exploración de regiones difíciles
+`max_raw_candidates_per_pool` limits candidates evaluated before the
+thermodynamic calculation. It supports rapid exploration but does not replace
+an exhaustive final search.
 
-Para una exploración rápida, `max_raw_candidates_per_pool` limita cuántos
-candidatos se evalúan antes del cálculo termodinámico. Es útil en ventanas
-grandes, pero no reemplaza una búsqueda exhaustiva para una recomendación
-final.
-
-El caso de regresión FTO rs8050136 incluido en el paquete usa:
-
-```r
-design <- design_arms_primers(
-  gene_seq, snp_pos, ref_allele = "C", alt_allele = "A",
-  outer_flank = 85L, outer_length_min = 20L, outer_length_max = 20L,
-  inner_length_min = 18L, inner_length_max = 20L,
-  tm_min = 55, tm_max = 72, gc_min = 35, gc_max = 65,
-  dimer_dg_min = -8, hairpin_dg_min = -6, heterodimer_dg_min = -9,
-  control_amplicon_min = 150L, control_amplicon_max = 200L,
-  allele_amplicon_min = 80L, allele_amplicon_max = 150L,
-  min_band_diff = 20L, max_candidates_per_pool = 8L,
-  max_raw_candidates_per_pool = 8L
-)
-```
-
-Ese caso tiene bandas esperadas de 152 bp (control), 105 bp (referencia) y
-84 bp (alternativa). El límite de dímero cruzado es deliberadamente relajado;
-revise el set con una herramienta termodinámica independiente antes de usarlo.
-
-## Productos, gel y mapas
+## Products, gel, and maps
 
 ```r
 pcr <- simulate_arms_pcr(
@@ -95,25 +70,21 @@ export_arms_primers_txt(design, "arms_design.txt")
 export_arms_amplicon_map_txt(pcr, "arms_nucleotide_map.txt")
 ```
 
-`ref/ref` muestra control + referencia; `ref/alt`, las tres bandas; y
-`alt/alt`, control + alternativa. El mapa TXT lista la hebra forward 5'→3' y
-la complementaria 3'→5' alineadas base por base, con las coordenadas del
-FASTA y los primers almacenados 5'→3'. Para el control heterocigoto se indica
-que la banda representa ambas plantillas; la secuencia impresa usa la
-representación de referencia.
+`ref/ref` shows control plus reference band; `ref/alt` shows all three bands;
+and `alt/alt` shows control plus alternate band. The map records both strands,
+FASTA coordinates, the SNP, and primers stored 5'→3'.
 
 ## Pipeline
-
-Cuando el flujo paso a paso esté revisado, use:
 
 ```r
 result <- run_arms_pcr_pipeline(
   gene_seq,
-  flank_seq = "SECUENCIA_5_PRIMA_ANTES_DEL_SNP",
+  flank_seq = "5_PRIME_SEQUENCE_BEFORE_THE_SNP",
   alt_allele = "A",
   output_file = "arms_design.txt"
 )
 ```
 
-El objeto conserva `snp`, `design`, `report`, `pcr_result` y `gel` para una
-revisión reproducible.
+The result retains `snp`, `design`, `report`, `pcr_result`, and `gel` for
+reproducible review. Use the [troubleshooting guide](CASOS_PROBLEMATICOS.md)
+when no set is found or the expected bands are ambiguous.

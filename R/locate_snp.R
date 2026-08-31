@@ -26,7 +26,12 @@
 #' flanking sequence in the reference sequence. If the flanking sequence
 #' appears more than once, the first match is used and a warning is
 #' issued; in that case, using a longer and more specific flanking sequence
-#' is recommended.
+#' is recommended. When the flank is found on the complementary strand,
+#' `snp_base` remains the nucleotide present in the loaded FASTA sequence
+#' (shown 5' to 3'). The function prints a note with the complementary base,
+#' which is the base in the orientation of the supplied dbSNP flank. If that
+#' base agrees with the reference allele in the literature, the analysis can
+#' continue using the returned coordinate and `snp_base`.
 #'
 #' @export
 locate_snp <- function(gene_seq, flank_seq, snp_offset = 1) {
@@ -81,6 +86,22 @@ locate_snp <- function(gene_seq, flank_seq, snp_offset = 1) {
     "Nucleotide at position %d (%s) [found on the %s strand]",
     snp_pos, snp_base, strand_info
   ))
+
+  if (identical(strand_info, "complementary")) {
+    flank_base <- as.character(Biostrings::complement(
+      Biostrings::DNAString(snp_base)
+    ))
+    message(sprintf(
+      paste0(
+        "Note: the reported nucleotide (%s) is the base in the loaded FASTA ",
+        "sequence (5' to 3'). The supplied dbSNP flank was found on the ",
+        "complementary strand; the equivalent base in the flank orientation is %s. ",
+        "If this base agrees with the reference allele in the literature, ",
+        "you can continue with the workflow."
+      ),
+      snp_base, flank_base
+    ))
+  }
 
   list(snp_pos = snp_pos, snp_base = snp_base, strand = strand_info)
 }
