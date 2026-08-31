@@ -142,6 +142,31 @@ heterozygote has 323, 225, and 98 bp bands. This is an output from
 `simulate_gel()`, not an experimental gel. Confirm enzyme conditions and
 primer specificity before synthesis.
 
+### Export and review the MTHFR design record
+
+Export the design immediately after candidate selection. This preserves the
+recommended pair and the ranked alternatives in a portable TXT report, so the
+computational choice can be reviewed alongside the laboratory assay record.
+
+```r
+mthfr_report <- export_primers_txt(
+  design,
+  output_file = "mthfr_c677t_pcr_rflp_primer_report.txt"
+)
+
+# `mthfr_report` is the path of the file just written.
+mthfr_report
+```
+
+For this PCR-RFLP example, review the recommended forward and reverse primer
+sequences (always reported 5'→3'), their Tm and GC values, the 323 bp amplicon,
+and the candidate ranking. The fragment sizes in this report are an
+SNP-coordinate estimate used during ranking; retain the separate simulated
+HinfI result above (225 and 98 bp for the alternate allele) as the exact
+in-silico cut verification. Archive both results with the FASTA accession and
+assembly, flank sequence, alleles/orientation, enzyme and cut convention, and
+the package version used for the run.
+
 ## FTO rs8050136 tetra-primer ARMS-PCR example
 
 The bundled FTO regression case uses a 171 bp reference window, SNP coordinate
@@ -202,3 +227,34 @@ simulate_arms_gel(pcr_result)
 
 The heterozygote shows all three bands. The regression thresholds are an
 exploratory example and require independent review before experimental use.
+
+### Export and review the FTO design record
+
+The ARMS-PCR design report captures the recommended four-primer set, the
+ranked alternatives, expected `ref/ref`, `ref/alt`, and `alt/alt` bands, and
+the parameter values used to generate the design.
+
+```r
+fto_report <- export_arms_primers_txt(
+  design,
+  output_file = "fto_rs8050136_arms_pcr_primer_report.txt"
+)
+
+# Optional companion file: a nucleotide-level map of every simulated product.
+fto_product_map <- export_arms_amplicon_map_txt(
+  pcr_result,
+  output_file = "fto_rs8050136_arms_pcr_product_map.txt"
+)
+
+fto_report
+fto_product_map
+```
+
+Use the design report to review all four sequences (5'→3'), primer positions,
+the deliberate inner-primer mismatches, and the predicted 152, 105, and 84 bp
+products before ordering. The companion map is useful for a laboratory record
+because it preserves the nucleotide sequence, FASTA coordinates, SNP position,
+and participating primers for each simulated product. Keep both TXT files with
+the reference accession/assembly, allele orientation, reaction conditions, and
+independent specificity and oligonucleotide-quality checks; neither report
+replaces experimental optimization or validation.

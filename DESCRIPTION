@@ -1,6 +1,6 @@
 Package: rflpSNP
 Title: In Silico Design and Simulation of PCR-RFLP and ARMS-PCR Assays for SNP Genotyping
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person("Miguel", "Esparza", , "esparzamiguel057@gmail.com", role = c("aut", "cre"))
 Author: Miguel Esparza [aut, cre]

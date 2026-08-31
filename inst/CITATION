@@ -10,6 +10,7 @@ bibentry(
     comment = c(ORCID = "0000-0001-9157-1607")
   ),
   year = "2026",
-  note = "R package version 0.1.0",
+  note = "R package version 0.1.1",
+  doi = "10.5281/zenodo.21425389",
   url = "https://github.com/Mike-EA/rflpSNP"
 )

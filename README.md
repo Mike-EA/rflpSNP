@@ -8,6 +8,7 @@
 [![R-CMD-check](https://github.com/Mike-EA/rflpSNP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Mike-EA/rflpSNP/actions/workflows/R-CMD-check.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://Mike-EA.github.io/rflpSNP/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21425389.svg)](https://doi.org/10.5281/zenodo.21425389)
 <!-- badges: end -->
 
 ---
@@ -38,6 +39,23 @@ Both routes begin with a reference FASTA sequence and a dbSNP flanking sequence,
 | Product simulation | Simulates the PCR amplicon, restriction sites, alternate allele, and predicted digest fragments. | Simulates control, reference-specific, and alternative-specific products for all three genotypes. |
 | Visualization | Produces amplicon and sequence maps plus a virtual agarose gel for the digest pattern. | Produces a virtual agarose gel and exports nucleotide-level maps of simulated products. |
 | Reproducibility | Exports primer reports and runs the workflow with `run_pcr_rflp_pipeline()`. | Exports primer and amplicon-map reports and runs the workflow with `run_arms_pcr_pipeline()`. |
+
+### Export a design report for experimental review
+
+After a valid design is found, save it as a plain-text report that can be
+reviewed, shared, and archived with the assay record. Use
+`export_primers_txt()` for PCR-RFLP designs and `export_arms_primers_txt()` for
+tetra-primer ARMS-PCR designs. Both reports identify the recommended design and
+retain the highest-ranked alternatives; the PCR-RFLP report includes primer
+sequences, Tm, GC content, expected amplicon and estimated fragments, whereas
+the ARMS-PCR report also records the four-primer layout, predicted genotype
+bands, and design parameters.
+
+The text report is a practical design record, not a synthesis order or a
+substitute for laboratory validation. Archive it with the reference FASTA and
+its accession/assembly, SNP and allele orientation, restriction-enzyme details
+(for PCR-RFLP), package version, and the results of independent specificity and
+oligonucleotide-quality checks.
 
 ---
 
@@ -198,7 +216,24 @@ design$best_pair
 design$n_pairs_total
 ```
 
-### 4. Simulate PCR
+### 4. Export the primer-design report
+
+Save the recommended pair and the ranked alternatives before moving on to the
+simulation. The returned path identifies the TXT file written to the working
+directory (or use a full path in `output_file`).
+
+```r
+report_file <- export_primers_txt(
+  design,
+  output_file = "mthfr_pcr_rflp_primer_report.txt"
+)
+```
+
+The report is intended for experimental review: inspect the recommended primer
+sequences, Tm/GC values, amplicon size, estimated fragments, and alternative
+pairs. Confirm the actual restriction cut after simulating the amplicon.
+
+### 5. Simulate PCR
 
 ```r
 bp <- design$best_pair
@@ -208,7 +243,7 @@ pcr <- simulate_pcr(gene_seq,
                     rev_primer = bp$reverse_seq)
 ```
 
-### 5. Find the restriction site
+### 6. Find the restriction site
 
 For the example using *HinfI*:
 
@@ -218,7 +253,7 @@ site <- find_restriction_site(pcr,
                               cut_offset = 1)
 ```
 
-### 6. Simulate the complete PCR-RFLP workflow
+### 7. Simulate the complete PCR-RFLP workflow
 
 Once the individual steps are understood:
 
@@ -233,6 +268,10 @@ result$design
 result$pcr_result
 result$restriction_result
 ```
+
+`run_pcr_rflp_pipeline()` writes this same TXT report by default. Set
+`export_txt = FALSE` only when an on-disk report is not wanted, or provide an
+`output_file` to choose its name and location.
 
 ---
 
@@ -437,6 +476,7 @@ teaching and research use:
 | [Experimental design guide](docs/EXPERIMENTAL_DESIGN_GUIDE.md) | Select a strategy, prepare inputs and plan controls |
 | [PCR-RFLP user guide](docs/PCR_RFLP_USER_GUIDE.md) | Run and review the PCR-RFLP workflow step by step |
 | [ARMS-PCR user guide](docs/ARMS_PCR_USER_GUIDE.md) | Design and simulate tetra-primer ARMS-PCR assays |
+| [Assay-specific parameters and reproducible examples](docs/PARAMETER_TUNING_AND_WORKED_EXAMPLES.md) | Reproduce the MTHFR and FTO workflows, including their TXT design records |
 | [Limitations and validation](docs/LIMITATIONS_AND_VALIDATION.md) | Separate in-silico predictions from experimental evidence |
 | [Troubleshooting guide](docs/TROUBLESHOOTING_GUIDE.md) | Investigate ambiguous inputs and results |
 
@@ -492,11 +532,14 @@ SOFTWARE.
 
 ## Citation
 
-> cff-version: 1.2.0
+If you use `rflpSNP`, cite the release-specific Zenodo record:
 
-If you use this software, please cite it as below.
+Esparza Armenta, M. (2026). *rflpSNP: An open-source R pipeline for PCR-RFLP
+and ARMS-PCR assay design and in silico simulation* (Version 0.1.1) [Computer
+software]. Zenodo. https://doi.org/10.5281/zenodo.21425389
 
-Esparza Armenta, M. (2026). rflpSNP: An open-source R pipeline for RFLP primer design and in silico gel simulation (Version 0.1.0) [Computer software]. https://github.com/Mike-EA/rflpSNP
+The package citation is maintained in [`inst/CITATION`](inst/CITATION), so it
+is also available from R with `citation("rflpSNP")`.
 
 ---
 
