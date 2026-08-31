@@ -70,41 +70,31 @@ oligonucleotide-quality checks.
 
 ### Install `rflpSNP` and its dependencies
 
-Run one of the following commands in a new R session. Both commands install
+Run the following commands in a new R session. They install
 the CRAN and Bioconductor packages declared by `rflpSNP`; no separate manual
 installation of `TmCalculator` or Bioconductor packages is required.
 
-For the stable version on `main`:
-
 ```r
 if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 
-remotes::install_github("Mike-EA/rflpSNP@main",
-                        dependencies = NA,
-                        upgrade = "never")
+remotes::install_github(
+  "Mike-EA/rflpSNP@main",
+  dependencies = NA,
+  upgrade = "never"
+)
 ```
 
-For the ARMS-PCR development branch before it is merged into `main`:
+`dependencies = NA` installs all required dependencies declared in
+`Depends`, `Imports` and `LinkingTo`, including the CRAN and Bioconductor
+packages required by `TmCalculator`. Do not install `TmCalculator` separately
+with `dependencies = FALSE`: that can leave packages such as
+`GenomeInfoDbData` missing.
 
-```r
-if (!requireNamespace("remotes", quietly = TRUE)) {
-  install.packages("remotes")
-}
-
-remotes::install_github("Mike-EA/rflpSNP@arms_pcr",
-                        dependencies = NA,
-                        upgrade = "never")
-```
-
-`dependencies = NA` installs dependencies declared in `Depends`, `Imports`
-and `LinkingTo`, including the packages required by `TmCalculator`. Avoid
-installing `TmCalculator` separately with `dependencies = FALSE`, because
-that can leave indirect Bioconductor dependencies unavailable.
-
-`devtools::install_github()` is equivalent, but `remotes` is used here because
-it is smaller and provides the same installation engine.
+`devtools::install_github()` is equivalent for this purpose, but `remotes` is
+used here because it is smaller and is the installation engine used by
+`devtools`.
 
 ### Load the package
 
@@ -130,8 +120,8 @@ A successful installation should report:
 [OK] calc_tm() is working correctly; test Tm = ...
 ```
 
-If a `[DIAGNOSTIC]` message appears, restart R and repeat the command for the
-branch you are using with `force = TRUE` added to `remotes::install_github()`.
+If a `[DIAGNOSTIC]` message appears, restart R and repeat the installation
+command above with `force = TRUE` added to `remotes::install_github()`.
 
 ---
 

@@ -269,7 +269,7 @@ check_tm_backend <- function() {
     cat("Validated TmCalculator version: 1.0.8\n")
     cat("Restart R and reinstall rflpSNP with its required dependencies:\n\n")
     cat(
-      'remotes::install_github("Mike-EA/rflpSNP", ',
+      'remotes::install_github("Mike-EA/rflpSNP@main", ',
       'dependencies = NA, upgrade = "never", force = TRUE)\n\n',
       sep = ""
     )
